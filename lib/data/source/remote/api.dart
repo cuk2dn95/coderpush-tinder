@@ -3,10 +3,10 @@ import 'package:dio/dio.dart';
 
 class HttpClient {
   HttpClient() {
-    dio = Dio();
-    dio.options.baseUrl = AppConstant.baseUrl;
-    dio.interceptors.add(LogInterceptor(responseBody: true));
-    dio.interceptors.add(InterceptorsWrapper(
+    _dio = Dio();
+    _dio.options.baseUrl = AppConstant.baseUrl;
+    _dio.interceptors.add(LogInterceptor(responseBody: true));
+    _dio.interceptors.add(InterceptorsWrapper(
         onRequest: (options, handler) {
           options.headers.addEntries(
               <String, dynamic>{'app-id': AppConstant.appId}.entries);
@@ -15,24 +15,24 @@ class HttpClient {
     );
   }
 
-  late Dio dio;
+  late Dio _dio;
 
   Future<Response<T>> get<T>(String path, {
     Map<String, dynamic>? queryParameters,
-  }) => dio.get<T>(path, queryParameters: queryParameters);
+  }) => _dio.get<T>(path, queryParameters: queryParameters);
 
   Future<Response<T>> post<T>(String path, {
     data,
     Map<String, dynamic>? queryParameters,
-  }) => dio.post<T>(path, data: data, queryParameters: queryParameters);
+  }) => _dio.post<T>(path, data: data, queryParameters: queryParameters);
 
   Future<Response<T>> put<T>(String path, {
     data,
     Map<String, dynamic>? queryParameters,
-  }) => dio.put<T>(path, data: data, queryParameters: queryParameters);
+  }) => _dio.put<T>(path, data: data, queryParameters: queryParameters);
 
   Future<Response<T>> delete<T>(String path, {
     data,
     Map<String, dynamic>? queryParameters,
-  }) => dio.delete<T>(path, data: data, queryParameters: queryParameters);
+  }) => _dio.delete<T>(path, data: data, queryParameters: queryParameters);
 }

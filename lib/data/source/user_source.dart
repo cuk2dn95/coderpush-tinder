@@ -8,13 +8,13 @@ import '../utility/dio_response_parse.dart';
 import 'remote/api.dart';
 
 class UserSource implements UserRepository {
-  const UserSource(this.httpClient);
+  const UserSource(this._httpClient);
 
-  final HttpClient httpClient;
+  final HttpClient _httpClient;
 
   @override
   Future<Either<UserResponse, ErrorResponse>> getUsers(int limit, int page) {
-    return httpClient.get('/user',
+    return _httpClient.get('/user',
         queryParameters: <String, dynamic>{
           'limit': limit,
           'page': page

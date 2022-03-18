@@ -6,9 +6,9 @@ import '../repository/user_repository.dart';
 
 
 class GetUsersUseCase {
-  GetUsersUseCase(this.repository);
+  GetUsersUseCase(this._repository);
 
-  final UserRepository repository;
+  final UserRepository _repository;
 
-  Future<Either<UserResponse, ErrorResponse>> call(int page, int limit)  => repository.getUsers(limit, page);
+  Future<Either<UserResponse, ErrorResponse>> call(int page, int limit)  => _repository.getUsers(limit, page);
 }
