@@ -1,14 +1,22 @@
-
-import 'package:coderpush_tinder/domain/repository/user_repository.dart';
-import 'package:coderpush_tinder/domain/response/error_response.dart';
-import 'package:coderpush_tinder/domain/response/user_response.dart';
 import 'package:dartz/dartz.dart';
 
+import '../../domain/entity/response/error_response.dart';
+import '../../domain/entity/response/user_response.dart';
+import '../../domain/repository/user_repository.dart';
+import '../remote/api.dart';
+import '../utility/dio_response_parse.dart';
+
 class UserSource implements UserRepository {
+  const UserSource(this.httpClient);
+
+  final HttpClient httpClient;
+
   @override
   Future<Either<UserResponse, ErrorResponse>> getUsers(int limit, int page) {
-    // TODO: implement getUsers
-    throw UnimplementedError();
+    return httpClient.get('/user',
+        queryParameters: <String, dynamic>{
+          'limit': limit,
+          'page': page
+        }).consume<UserResponse>(UserResponse.fromMap);
   }
-
 }

@@ -5,6 +5,7 @@ class HttpClient {
   HttpClient() {
     dio = Dio();
     dio.options.baseUrl = AppConstant.baseUrl;
+    dio.interceptors.add(LogInterceptor(responseBody: true));
     dio.interceptors.add(InterceptorsWrapper(
         onRequest: (options, handler) {
           options.headers.addEntries(

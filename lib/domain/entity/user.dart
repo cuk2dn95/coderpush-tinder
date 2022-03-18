@@ -27,4 +27,20 @@ class User {
         lastName: lastName ?? this.lastName,
         picture: picture ?? this.picture,
       );
+
+  factory User.fromMap(Map<String, dynamic> json) => User(
+    id: json["id"],
+    title: json["title"],
+    firstName: json["firstName"],
+    lastName: json["lastName"],
+    picture: json["picture"],
+  );
+
+  Map<String, dynamic> toMap() => {
+    "id": id,
+    "title": title,
+    "firstName": firstName,
+    "lastName": lastName,
+    "picture": picture,
+  };
 }
