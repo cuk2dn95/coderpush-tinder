@@ -3,8 +3,9 @@ import 'package:dartz/dartz.dart';
 import '../../domain/entity/response/error_response.dart';
 import '../../domain/entity/response/user_response.dart';
 import '../../domain/repository/user_repository.dart';
-import '../remote/api.dart';
+
 import '../utility/dio_response_parse.dart';
+import 'remote/api.dart';
 
 class UserSource implements UserRepository {
   const UserSource(this.httpClient);
