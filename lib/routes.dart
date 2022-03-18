@@ -1,4 +1,5 @@
-import 'package:coderpush_tinder/screens/home.dart';
+
+import 'package:coderpush_tinder/presentation/screens/home.dart';
 import 'package:flutter/material.dart';
 
 class RoutePaths {}
