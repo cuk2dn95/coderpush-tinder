@@ -1,6 +1,8 @@
+
 import 'package:dartz/dartz.dart';
 
 import '../../domain/entity/response/error_response.dart';
+import '../../domain/entity/response/user_detail_response.dart';
 import '../../domain/entity/response/user_response.dart';
 import '../../domain/repository/user_repository.dart';
 
@@ -19,5 +21,11 @@ class UserSource implements UserRepository {
           'limit': limit,
           'page': page
         }).consume<UserResponse>(UserResponse.fromMap);
+  }
+
+  @override
+  Future<Either<UserDetailResponse, ErrorResponse>> getUserDetail(String id) {
+    return _httpClient.get('/user/$id',
+        ).consume<UserDetailResponse>(UserDetailResponse.fromMap);
   }
 }
