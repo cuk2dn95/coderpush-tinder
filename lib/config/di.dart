@@ -1,4 +1,6 @@
 import 'package:coderpush_tinder/data/source/local/database.dart';
+import 'package:coderpush_tinder/domain/usecase/get_user_detail_usecase.dart';
+import 'package:coderpush_tinder/presentation/viewmodel/home_viewmodel.dart';
 
 import '../data/source/remote/api.dart';
 import '../data/source/user_source.dart';
@@ -18,6 +20,10 @@ abstract class Injector {
 
 
   //register UseCase
-  static GetUsersUseCase usersUseCase() => GetUsersUseCase(userRepository());
+  static GetUsersUseCase getUsersUseCase() => GetUsersUseCase(userRepository());
+  static GetUserDetailUseCase getUserDetailUseCase() => GetUserDetailUseCase(userRepository());
 
+
+  //register viewModel
+  static HomeViewModel homeViewModel() => HomeViewModel(getUsersUseCase(), getUserDetailUseCase());
 }
