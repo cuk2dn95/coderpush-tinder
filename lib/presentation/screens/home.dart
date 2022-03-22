@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:coderpush_tinder/config/di.dart';
 import 'package:coderpush_tinder/presentation/viewmodel/home_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: LayoutBuilder(
                     builder: (context, BoxConstraints contrainst) {
                   return TinderSwapCard(
+                    cardController: viewmodel.cardController,
                     cardBuilder: (BuildContext context, int index) => ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Stack(
@@ -34,6 +37,79 @@ class _HomeScreenState extends State<HomeScreen> {
                             decoration: const BoxDecoration(
                                 color: Colors.lightBlueAccent),
                           )),
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: StreamBuilder<int>(
+                                stream: viewmodel.currentCardIndex,
+                                initialData: 0,
+                                builder: (context, snapshot) {
+                                  return Visibility(
+                                    visible: snapshot.requireData == index,
+                                    child: StreamBuilder<double>(
+                                        stream: viewmodel.onLikeOpacity,
+                                        initialData: 0,
+                                        builder: (context, snapshot) {
+                                          return _wrapperInteractionBadge(
+                                            'LIKE',
+                                            Colors.greenAccent,
+                                            Matrix4.identity()
+                                              ..setRotationZ(-pi / 18),
+                                            snapshot.requireData,
+                                          );
+                                        }),
+                                  );
+                                }),
+                          ),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: StreamBuilder<int>(
+                                stream: viewmodel.currentCardIndex,
+                                initialData: 0,
+                                builder: (context, snapshot) {
+                                  return Visibility(
+                                    visible: snapshot.requireData == index,
+                                    child: StreamBuilder<double>(
+                                        stream: viewmodel.onDeclineOpacity,
+                                        initialData: 0,
+                                        builder: (context, snapshot) {
+                                          return _wrapperInteractionBadge(
+                                            'NOPE',
+                                            Colors.redAccent,
+                                            Matrix4.identity()
+                                              ..setRotationZ(pi / 18),
+                                            snapshot.requireData,
+                                          );
+                                        }),
+                                  );
+                                }),
+                          ),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: StreamBuilder<int>(
+                                stream: viewmodel.currentCardIndex,
+                                initialData: 0,
+                                builder: (context, snapshot) {
+                                  return Visibility(
+                                    visible: snapshot.requireData == index,
+                                    child: StreamBuilder<double>(
+                                        stream: viewmodel.onSuperLikeOpacity,
+                                        initialData: 0,
+                                        builder: (context, snapshot) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 65 + 16 + 80),
+                                            child: _wrapperInteractionBadge(
+                                              'SUPER LIKE',
+                                              Colors.lightBlueAccent,
+                                              Matrix4.identity()
+                                                ..setRotationZ(-pi / 18),
+                                              snapshot.requireData,
+                                            ),
+                                          );
+                                        }),
+                                  );
+                                }),
+                          ),
                           Align(
                             alignment: Alignment.bottomCenter,
                             child: LayoutBuilder(
@@ -105,6 +181,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         (DragUpdateDetails details, Alignment align) {
                       /// Get swiping card's alignment
 
+                      viewmodel.onAttemptDecline(align.x);
+                      viewmodel.onAttemptLike(align.x);
+                      viewmodel.onAttemptSuperLike(align.y);
+
                       if (align.y < 0) {
                         viewmodel.onSuperLikeButtonFocus(true);
                         viewmodel.onDeclineButtonFocus(false);
@@ -130,6 +210,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     swipeCompleteCallback:
                         (CardSwipeOrientation orientation, int index) {
+                      viewmodel.onCurrentIndexCardChanged(orientation  == CardSwipeOrientation.recover ?index : index +1);
+                      viewmodel.onAttemptDecline(0);
+                      viewmodel.onAttemptLike(0);
+                      viewmodel.onAttemptSuperLike(0);
+
                       viewmodel.onLikeButtonFocus(false);
                       viewmodel.onDeclineButtonFocus(false);
                       viewmodel.onSuperLikeButtonFocus(false);
@@ -172,9 +257,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   size: 30,
                                 ),
                                 Colors.red,
-                                size: 65,
-                                onTap: () {},
-                                isFocus: snapshot.data),
+                                size: 65, onTap: () {
+                          viewmodel.onDecline(null);
+                        }, isFocus: snapshot.data),
                       ),
                       StreamBuilder<bool>(
                         stream: viewmodel.superLikeButtonFocusStream,
@@ -189,9 +274,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Icons.star,
                                   color: Colors.white,
                                 ),
-                                Colors.blue,
-                                onTap: () {},
-                                isFocus: snapshot.data),
+                                Colors.blue, onTap: () {
+                          viewmodel.onSuperLike(null);
+                        }, isFocus: snapshot.data),
                       ),
                       StreamBuilder<bool>(
                         stream: viewmodel.likeButtonFocusStream,
@@ -209,9 +294,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   size: 28,
                                 ),
                                 Colors.green,
-                                size: 65,
-                                onTap: () {},
-                                isFocus: snapshot.data),
+                                size: 65, onTap: () {
+                          viewmodel.onLike(null);
+                        }, isFocus: snapshot.data),
                       ),
                       _wrapperInteractionIcon(
                           const Icon(
@@ -233,6 +318,34 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         bottomNavigationBar: const BottomNavigation(),
       );
+
+  Widget _wrapperInteractionBadge(
+      String text, Color color, Matrix4? tranform, double opacity) {
+    return Opacity(
+      opacity: opacity,
+      child: Container(
+        transform: tranform,
+        constraints: const BoxConstraints(minWidth: 80),
+        margin: const EdgeInsets.only(top: 32, left: 16),
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+        decoration: BoxDecoration(
+            border: Border.all(
+              color: color,
+              width: 3,
+            ),
+            borderRadius: BorderRadius.circular(6),
+            shape: BoxShape.rectangle),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: Theme.of(context)
+              .textTheme
+              .headline4
+              ?.copyWith(color: color, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
 
   Widget _wrapperInteractionIcon(
     Icon icon,
