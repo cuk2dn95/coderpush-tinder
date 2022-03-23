@@ -1,4 +1,4 @@
-import 'package:coderpush_tinder/data/constant.dart';
+import '../../constant.dart';
 import 'package:dio/dio.dart';
 
 class HttpClient {
@@ -7,7 +7,7 @@ class HttpClient {
     _dio.options.baseUrl = AppConstant.baseUrl;
     _dio.interceptors.add(LogInterceptor(responseBody: true));
     _dio.interceptors.add(InterceptorsWrapper(
-        onRequest: (options, handler) {
+        onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
           options.headers.addEntries(
               <String, dynamic>{'app-id': AppConstant.appId}.entries);
           handler.next(options);
@@ -22,17 +22,17 @@ class HttpClient {
   }) => _dio.get<T>(path, queryParameters: queryParameters);
 
   Future<Response<T>> post<T>(String path, {
-    data,
+    dynamic data,
     Map<String, dynamic>? queryParameters,
   }) => _dio.post<T>(path, data: data, queryParameters: queryParameters);
 
   Future<Response<T>> put<T>(String path, {
-    data,
+    dynamic data,
     Map<String, dynamic>? queryParameters,
   }) => _dio.put<T>(path, data: data, queryParameters: queryParameters);
 
   Future<Response<T>> delete<T>(String path, {
-    data,
+    dynamic data,
     Map<String, dynamic>? queryParameters,
   }) => _dio.delete<T>(path, data: data, queryParameters: queryParameters);
 }

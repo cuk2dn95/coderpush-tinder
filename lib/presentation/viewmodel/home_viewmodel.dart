@@ -1,6 +1,11 @@
 import 'dart:async';
-import 'package:coderpush_tinder/domain/usecase/save_user_usecase.dart';
-import 'package:coderpush_tinder/domain/usecase/user_page_usecase.dart';
+import '../../domain/entity/response/error_response.dart';
+import '../../domain/entity/response/user_detail_response.dart';
+import '../../domain/entity/response/user_response.dart';
+import 'package:dartz/dartz.dart';
+
+import '../../domain/usecase/save_user_usecase.dart';
+import '../../domain/usecase/user_page_usecase.dart';
 import 'package:flutter/cupertino.dart';
 import '../../domain/entity/user.dart';
 import '../../domain/usecase/get_user_detail_usecase.dart';
@@ -29,27 +34,27 @@ class HomeViewModel extends ChangeNotifier {
 
   late int _currentPage;
 
-  final _onDeclineButtonFocus = StreamController<bool>();
+  final StreamController<bool> _onDeclineButtonFocus = StreamController<bool>();
 
   get declineButtonFocusStream => _onDeclineButtonFocus.stream;
 
-  final _onSuperLikeButtonFocus = StreamController<bool>();
+  final StreamController<bool> _onSuperLikeButtonFocus = StreamController<bool>();
 
   get superLikeButtonFocusStream => _onSuperLikeButtonFocus.stream;
 
-  final _onLikeButtonFocus = StreamController<bool>();
+  final StreamController<bool> _onLikeButtonFocus = StreamController<bool>();
 
   get likeButtonFocusStream => _onLikeButtonFocus.stream;
 
-  void onDeclineButtonFocus(bool focus) {
+  void onDeclineButtonFocus({bool focus = false}) {
     _onDeclineButtonFocus.add(focus);
   }
 
-  void onSuperLikeButtonFocus(bool focus) {
+  void onSuperLikeButtonFocus({bool focus = false}) {
     _onSuperLikeButtonFocus.add(focus);
   }
 
-  void onLikeButtonFocus(bool focus) {
+  void onLikeButtonFocus({bool focus = false}) {
     _onLikeButtonFocus.add(focus);
   }
 
@@ -82,15 +87,15 @@ class HomeViewModel extends ChangeNotifier {
     _saveUsersUseCase.saveLikedUsers(user);
   }
 
-  final _onDeclineOpacity = StreamController<double>.broadcast();
+  final StreamController<double> _onDeclineOpacity = StreamController<double>.broadcast();
 
   get onDeclineOpacity => _onDeclineOpacity.stream;
 
-  final _onSuperLikeOpacity = StreamController<double>.broadcast();
+  final StreamController<double> _onSuperLikeOpacity = StreamController<double>.broadcast();
 
   get onSuperLikeOpacity => _onSuperLikeOpacity.stream;
 
-  final _onLikeOpacity = StreamController<double>.broadcast();
+  final StreamController<double> _onLikeOpacity = StreamController<double>.broadcast();
 
   get onLikeOpacity => _onLikeOpacity.stream;
 
@@ -123,7 +128,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   int _currentCardIndex = 0;
-  final thresholdIndexLoading = 5;
+  final int thresholdIndexLoading = 5;
 
   get currentCardIndex => _currentCardIndex;
 
@@ -151,8 +156,8 @@ class HomeViewModel extends ChangeNotifier {
       }
     }
 
-    _getUsersUseCase(_currentPage, limit).then((value) {
-      value.fold((data) {
+    _getUsersUseCase(_currentPage, limit).then((Either<UserResponse, ErrorResponse> value) {
+      value.fold((UserResponse data) {
         if (data.data.isNotEmpty) {
           users.addAll(data.data);
         } else {
@@ -160,7 +165,7 @@ class HomeViewModel extends ChangeNotifier {
         }
         saveCurrentUserPage();
         onLoaded();
-      }, (error) {
+      }, (ErrorResponse error) {
         isUserEmpty = true;
         onLoaded();
       });
@@ -180,11 +185,9 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String> getUserAge(String id) async {
-    return (await _getUserDetailUseCase(id)).fold(
-        (detail) =>
+  Future<String> getUserAge(String id) async => (await _getUserDetailUseCase(id)).fold(
+        (UserDetailResponse detail) =>
             (DateTime.now().difference(detail.dateOfBirth).inDays ~/ 365)
                 .toString(),
-        (r) => "");
-  }
+        (ErrorResponse r) => '');
 }

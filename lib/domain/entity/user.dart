@@ -8,6 +8,14 @@ class User {
     this.age
   });
 
+  factory User.fromMap(Map<String, dynamic> json) => User(
+    id: json['id'],
+    title: json['title'],
+    firstName: json['firstName'],
+    lastName: json['lastName'],
+    picture: json['picture'],
+  );
+
   final String id;
   final String title;
   final String firstName;
@@ -30,20 +38,13 @@ class User {
         picture: picture ?? this.picture,
       );
 
-  factory User.fromMap(Map<String, dynamic> json) => User(
-    id: json["id"],
-    title: json["title"],
-    firstName: json["firstName"],
-    lastName: json["lastName"],
-    picture: json["picture"],
-  );
 
-  Map<String, dynamic> toMap() => {
-    "id": id,
-    "title": title,
-    "firstName": firstName,
-    "lastName": lastName,
-    "picture": picture,
+  Map<String, dynamic> toMap() => <String, dynamic>{
+    'id': id,
+    'title': title,
+    'firstName': firstName,
+    'lastName': lastName,
+    'picture': picture,
   };
 
   String name() => firstName + ' ' + lastName;

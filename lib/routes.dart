@@ -1,13 +1,13 @@
 
-import 'package:coderpush_tinder/presentation/screens/home.dart';
-import 'package:coderpush_tinder/presentation/screens/liked_list.dart';
-import 'package:coderpush_tinder/presentation/screens/second_look.dart';
+import 'presentation/screens/home.dart';
+import 'presentation/screens/liked_list.dart';
+import 'presentation/screens/second_look.dart';
 import 'package:flutter/material.dart';
 
 abstract class RoutePaths {
-  static const homeScreen = Navigator.defaultRouteName;
-  static const likedListRoute = 'LikedList';
-  static const secondLookRoute = 'SecondLook';
+  static const String homeScreen = Navigator.defaultRouteName;
+  static const String likedListRoute = 'LikedList';
+  static const String secondLookRoute = 'SecondLook';
 }
 
 Route<dynamic> routeFactory(RouteSettings settings) {
@@ -20,28 +20,26 @@ Route<dynamic> routeFactory(RouteSettings settings) {
       return _wrapper<dynamic>(const SecondLookScreen());
     default:
       return MaterialPageRoute<dynamic>(
-        builder: (context) {
-          return Scaffold(
+        builder: (BuildContext context) => Scaffold(
             body: Center(
               child: Column(children: [
                 const Text('Something error, back to home'),
                 ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pushNamedAndRemoveUntil(
-                          RoutePaths.homeScreen, (route) => false);
+                          RoutePaths.homeScreen, (Route<dynamic> route) => false);
                     },
                     child: const Text('Home'))
               ]),
             ),
-          );
-        },
+          ),
       );
   }
 }
 
 MaterialPageRoute<T> _wrapper<T>(Widget widget,
         {RouteSettings? setting, bool maintainState = true}) =>
-    MaterialPageRoute(
+    MaterialPageRoute<T>(
         builder: (_) => widget,
         settings: setting,
         maintainState: maintainState);

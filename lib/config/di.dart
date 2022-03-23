@@ -1,8 +1,8 @@
-import 'package:coderpush_tinder/data/source/local/database.dart';
-import 'package:coderpush_tinder/domain/usecase/get_user_detail_usecase.dart';
-import 'package:coderpush_tinder/presentation/viewmodel/home_viewmodel.dart';
-import 'package:coderpush_tinder/presentation/viewmodel/liked_list_viewmodel.dart';
-import 'package:coderpush_tinder/presentation/viewmodel/second_look_viewmodel.dart';
+import '../data/source/local/database.dart';
+import '../domain/usecase/get_user_detail_usecase.dart';
+import '../presentation/viewmodel/home_viewmodel.dart';
+import '../presentation/viewmodel/liked_list_viewmodel.dart';
+import '../presentation/viewmodel/second_look_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/source/remote/api.dart';
 import '../data/source/user_source.dart';

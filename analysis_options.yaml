@@ -9,6 +9,10 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    - "lib/presentation/widget/tinder_card.dart"
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
@@ -22,8 +26,103 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    - always_require_non_null_named_parameters
+    - annotate_overrides
+    - avoid_function_literals_in_foreach_calls
+    - avoid_init_to_null
+    - avoid_null_checks_in_equality_operators
+    - avoid_renaming_method_parameters
+    - avoid_return_types_on_setters
+    - avoid_returning_null_for_void
+    - avoid_single_cascade_in_expression_statements
+    - constant_identifier_names
+    - control_flow_in_finally
+    - empty_constructor_bodies
+    - empty_statements
+    - exhaustive_cases
+    - implementation_imports
+    - library_names
+    - library_prefixes
+    - null_closures
+    - overridden_fields
+    - package_names
+    - prefer_adjacent_string_concatenation
+    - prefer_collection_literals
+    - prefer_conditional_assignment
+    - prefer_contains
+    - prefer_equal_for_default_values
+    - prefer_final_fields
+    - prefer_for_elements_to_map_fromIterable
+    - prefer_function_declarations_over_variables
+    - prefer_if_null_operators
+    - prefer_initializing_formals
+    - prefer_inlined_adds
+    - prefer_is_not_operator
+    - prefer_null_aware_operators
+    - prefer_spread_collections
+    - prefer_void_to_null
+    - recursive_getters
+    - slash_for_doc_comments
+    - type_init_formals
+    - unnecessary_brace_in_string_interps
+    - unnecessary_const
+    - unnecessary_getters_setters
+    - unnecessary_new
+    - unnecessary_null_in_if_null_operators
+    - unnecessary_string_escapes
+    - unnecessary_string_interpolations
+    - unnecessary_this
+    - use_function_type_syntax_for_parameters
+    - use_rethrow_when_possible
+    - prefer_final_locals
+    - no_adjacent_strings_in_list
+    - avoid_implementing_value_types
+    - avoid_returning_null_for_future
+    - valid_regexps
+    - prefer_final_in_for_each
+    - avoid_void_async
+    - use_full_hex_values_for_flutter_colors
+    - avoid_returning_this
+    - prefer_const_constructors
+    - avoid_returning_null
+    - iterable_contains_unrelated_type
+    - void_checks
+    - parameter_assignments
+    - await_only_futures
+    - list_remove_unrelated_type
+    - throw_in_finally
+    - unrelated_type_equality_checks
+    - no_duplicate_case_values
+    - prefer_mixin
+    - invariant_booleans
+    - prefer_expression_function_bodies
+    - avoid_redundant_argument_values
+    - prefer_int_literals
+    - prefer_single_quotes
+    - unnecessary_lambdas
+    - prefer_is_empty
+    - cascade_invocations
+    - prefer_if_elements_to_conditional_expressions
+    - unnecessary_await_in_return
+    - non_constant_identifier_names
+    - sort_constructors_first
+    - avoid_unnecessary_containers
+    - sort_child_properties_last
+    - always_put_control_body_on_new_line
+    - unnecessary_parenthesis
+    - curly_braces_in_flow_control_structures
+    - unawaited_futures
+    - always_put_required_named_parameters_first
+    - prefer_const_declarations
+    - prefer_const_constructors_in_immutables
+    - unnecessary_statements
+    - avoid_bool_literals_in_conditional_expressions
+    - prefer_relative_imports
+    - avoid_setters_without_getters
+    - avoid_positional_boolean_parameters
+    - avoid_print
+    - use_setters_to_change_properties
+
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

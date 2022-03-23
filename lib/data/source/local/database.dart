@@ -8,8 +8,8 @@ class Database {
   late SharedPreferences _pref;
 
   Future<void> saveMapEntry(MapEntry<String, dynamic> entry) async {
-    final value = entry.value;
-    final key = entry.key;
+    final dynamic value = entry.value;
+    final String key = entry.key;
     if (value is int) {
       await _pref.setInt(key, value);
       return;

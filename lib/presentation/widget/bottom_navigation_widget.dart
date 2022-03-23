@@ -12,13 +12,11 @@ class BottomNavigation extends StatelessWidget {
   final GestureTapCallback _onSecondLookTap;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context) => Container(
       color: Colors.white,
       padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewPadding.bottom),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: GestureDetector(
@@ -63,5 +61,4 @@ class BottomNavigation extends StatelessWidget {
         ],
       ),
     );
-  }
 }

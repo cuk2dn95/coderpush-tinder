@@ -1,4 +1,4 @@
-import 'package:coderpush_tinder/config/di.dart';
+import '../../config/di.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +12,7 @@ class LikedListScreen extends StatefulWidget {
 }
 
 class _LikedListScreenState extends State<LikedListScreen> {
-  final viewmodel = Injector.likedListViewModel();
+  final LikedListViewModel viewmodel = Injector.likedListViewModel();
 
   @override
   Widget build(BuildContext context) =>

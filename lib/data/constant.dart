@@ -1,5 +1,5 @@
 
 abstract class AppConstant {
-  static const baseUrl = "https://dummyapi.io/data/v1";
-  static const appId = "62349560854e34e38c2d5783";
+  static String baseUrl = 'https://dummyapi.io/data/v1';
+  static String appId = '62349560854e34e38c2d5783';
 }

@@ -11,7 +11,7 @@ class SecondLookScreen extends StatefulWidget {
 }
 
 class _SecondLookScreenState extends State<SecondLookScreen> {
-  final viewmodel = Injector.secondLookViewModel();
+  final SecondLookViewModel viewmodel = Injector.secondLookViewModel();
 
   @override
   Widget build(BuildContext context) =>
