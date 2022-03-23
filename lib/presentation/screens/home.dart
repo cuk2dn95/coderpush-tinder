@@ -118,9 +118,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                               builder: (context, snapshot) =>
                                                   Padding(
                                                     padding:
-                                                        const EdgeInsets.only(
+                                                         EdgeInsets.only(
                                                             bottom:
-                                                                65 + 16 + 80),
+                                                                65 + 16 + MediaQuery.of(context).size.height * 0.2),
                                                     child:
                                                         _wrapperInteractionBadge(
                                                       'SUPER LIKE',

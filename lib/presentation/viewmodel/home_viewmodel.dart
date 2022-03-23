@@ -80,7 +80,7 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void onSuperLikeUser(User user) {
-
+    _saveUsersUseCase.saveLikedUsers(user);
   }
 
   void onLikeUser(User user) {
