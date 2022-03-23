@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:coderpush_tinder/routes.dart';
 import 'package:provider/provider.dart';
 import 'package:coderpush_tinder/config/di.dart';
 import 'package:coderpush_tinder/presentation/viewmodel/home_viewmodel.dart';
@@ -219,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           viewmodel.onAttemptLike(align.x);
                           viewmodel.onAttemptSuperLike(align.y);
 
-                          if (align.y < 0) {
+                          if (align.y < -0.5) {
                             //Card is UP swiping
                             viewmodel.onSuperLikeButtonFocus(true);
                             viewmodel.onDeclineButtonFocus(false);
@@ -247,7 +248,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         swipeCompleteCallback:
                             (CardSwipeOrientation orientation, int index) {
                           if (orientation != CardSwipeOrientation.recover) {
-                            viewmodel.onUserChosen(viewmodel.users[index]);
+                            final user = viewmodel.users[index];
+                            if (orientation == CardSwipeOrientation.up) {
+                              viewmodel.onSuperLikeUser(user);
+                            }
+                            if (orientation == CardSwipeOrientation.left) {
+                              viewmodel.onDeclineUser(user);
+                            }
+                            if (orientation == CardSwipeOrientation.right) {
+                              viewmodel.onLikeUser(user);
+                            }
+                            viewmodel.onUserChosen(user);
                           }
 
                           viewmodel.onCurrentIndexCardChanged(
@@ -272,19 +283,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding:
                         const EdgeInsets.only(bottom: 24, left: 16, right: 16),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _wrapperInteractionIcon(
-                            const Icon(
-                              Icons.replay,
-                              color: Colors.yellow,
-                            ),
-                            const Icon(
-                              Icons.replay,
-                              color: Colors.white,
-                            ),
-                            Colors.yellow,
-                            onTap: () {}),
                         StreamBuilder<bool>(
                           stream: viewmodel.declineButtonFocusStream,
                           initialData: false,
@@ -302,7 +302,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   Colors.red,
                                   size: 65, onTap: () {
-                            viewmodel.onDecline(null);
+                            if (viewmodel.users.isNotEmpty) {
+                              viewmodel.onDecline(viewmodel.users[0]);
+                            }
                           }, isFocus: snapshot.data),
                         ),
                         StreamBuilder<bool>(
@@ -319,7 +321,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: Colors.white,
                                   ),
                                   Colors.blue, onTap: () {
-                            viewmodel.onSuperLike(null);
+                            if (viewmodel.users.isNotEmpty) {
+                              viewmodel.onSuperLike(viewmodel.users[0]);
+                            }
                           }, isFocus: snapshot.data),
                         ),
                         StreamBuilder<bool>(
@@ -339,20 +343,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   Colors.green,
                                   size: 65, onTap: () {
-                            viewmodel.onLike(null);
+                            if (viewmodel.users.isNotEmpty) {
+                              viewmodel.onLike(viewmodel.users[0]);
+                            }
                           }, isFocus: snapshot.data),
                         ),
-                        _wrapperInteractionIcon(
-                            const Icon(
-                              Icons.flash_on,
-                              color: Colors.purple,
-                            ),
-                            const Icon(
-                              Icons.flash_on,
-                              color: Colors.white,
-                            ),
-                            Colors.purple,
-                            onTap: () {}),
                       ],
                     ),
                   ),
@@ -360,7 +355,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          bottomNavigationBar: const BottomNavigation(),
+          bottomNavigationBar: BottomNavigation(
+            () {
+              Navigator.of(context).pushNamed(RoutePaths.likedListRoute);
+            },
+            () {
+              Navigator.of(context).pushNamed(RoutePaths.secondLookRoute);
+            },
+          ),
         ),
       );
 

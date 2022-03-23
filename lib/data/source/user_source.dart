@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:coderpush_tinder/domain/entity/user.dart';
 import 'package:dartz/dartz.dart';
 
 import '../../common/database_key.dart';
@@ -42,5 +45,22 @@ class UserSource implements UserRepository {
   Future<void> saveCurrentUserPage(int page) async {
     await _database
         .saveMapEntry(MapEntry<String, int>(DatabaseKey.currentPage, page));
+  }
+
+  @override
+  Future<List<User>> getUsersByType(String type) async {
+    final json = _database.getValue<String>(type);
+    if (json == null) {
+      return <User>[];
+    }
+    return jsonDecode(json)
+        .map<User>((e) => User.fromMap(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  @override
+  Future<void> saveUsersByType(String type, List<User> users) async {
+    await _database
+        .saveMapEntry(MapEntry<String, String>(type, jsonEncode(users.map((e) => e.toMap()).toList())));
   }
 }

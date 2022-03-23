@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:coderpush_tinder/domain/usecase/save_user_usecase.dart';
 import 'package:coderpush_tinder/domain/usecase/user_page_usecase.dart';
 import 'package:flutter/cupertino.dart';
 import '../../domain/entity/user.dart';
@@ -8,7 +9,7 @@ import '../widget/tinder_card.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel(this._getUsersUseCase, this._getUserDetailUseCase,
-      this._userPageUseCase) {
+      this._userPageUseCase, this._saveUsersUseCase) {
     _currentPage = _userPageUseCase.getCurrentUserPage();
     loadUser();
   }
@@ -16,6 +17,7 @@ class HomeViewModel extends ChangeNotifier {
   final GetUsersUseCase _getUsersUseCase;
   final GetUserDetailUseCase _getUserDetailUseCase;
   final UserPageUseCase _userPageUseCase;
+  final SaveUsersUseCase _saveUsersUseCase;
 
   final List<User> users = List.empty(growable: true);
 
@@ -53,16 +55,31 @@ class HomeViewModel extends ChangeNotifier {
 
   final CardController cardController = CardController();
 
-  void onDecline(User? user) {
+  void onDecline(User user) {
     cardController.triggerLeft();
+    onDeclineUser(user);
   }
 
-  void onSuperLike(User? user) {
+  void onSuperLike(User user) {
     cardController.triggerUp();
+    onSuperLikeUser(user);
   }
 
-  void onLike(User? user) {
+  void onLike(User user) {
     cardController.triggerRight();
+    onLikeUser(user);
+  }
+
+  void onDeclineUser(User user) {
+    _saveUsersUseCase.savePassedUsers(user);
+  }
+
+  void onSuperLikeUser(User user) {
+
+  }
+
+  void onLikeUser(User user) {
+    _saveUsersUseCase.saveLikedUsers(user);
   }
 
   final _onDeclineOpacity = StreamController<double>.broadcast();

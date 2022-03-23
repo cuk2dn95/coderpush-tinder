@@ -4,6 +4,7 @@ import 'package:dartz/dartz.dart';
 import '../entity/response/error_response.dart';
 import '../entity/response/user_detail_response.dart';
 import '../entity/response/user_response.dart';
+import '../entity/user.dart';
 
 
 abstract class UserRepository {
@@ -14,4 +15,8 @@ abstract class UserRepository {
   int? getCurrentUserPage();
 
   Future<void> saveCurrentUserPage(int page);
+
+  Future<List<User>> getUsersByType(String type);
+
+  Future<void> saveUsersByType(String type, List<User> users);
 }

@@ -1,13 +1,23 @@
 
 import 'package:coderpush_tinder/presentation/screens/home.dart';
+import 'package:coderpush_tinder/presentation/screens/liked_list.dart';
+import 'package:coderpush_tinder/presentation/screens/second_look.dart';
 import 'package:flutter/material.dart';
 
-class RoutePaths {}
+abstract class RoutePaths {
+  static const homeScreen = Navigator.defaultRouteName;
+  static const likedListRoute = 'LikedList';
+  static const secondLookRoute = 'SecondLook';
+}
 
 Route<dynamic> routeFactory(RouteSettings settings) {
   switch (settings.name) {
-    case Navigator.defaultRouteName:
+    case RoutePaths.homeScreen:
       return _wrapper<dynamic>(const HomeScreen());
+    case RoutePaths.likedListRoute:
+      return _wrapper<dynamic>(const LikedListScreen());
+    case RoutePaths.secondLookRoute:
+      return _wrapper<dynamic>(const SecondLookScreen());
     default:
       return MaterialPageRoute<dynamic>(
         builder: (context) {
@@ -18,7 +28,7 @@ Route<dynamic> routeFactory(RouteSettings settings) {
                 ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pushNamedAndRemoveUntil(
-                          Navigator.defaultRouteName, (route) => false);
+                          RoutePaths.homeScreen, (route) => false);
                     },
                     child: const Text('Home'))
               ]),
