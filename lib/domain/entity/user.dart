@@ -5,6 +5,7 @@ class User {
     required this.firstName,
     required this.lastName,
     required this.picture,
+    this.age
   });
 
   final String id;
@@ -12,6 +13,7 @@ class User {
   final String firstName;
   final String lastName;
   final String picture;
+  String? age;
 
   User copyWith({
     String? id,
@@ -43,4 +45,6 @@ class User {
     "lastName": lastName,
     "picture": picture,
   };
+
+  String name() => firstName + ' ' + lastName;
 }

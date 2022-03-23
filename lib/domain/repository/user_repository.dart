@@ -10,4 +10,8 @@ abstract class UserRepository {
   Future<Either<UserResponse, ErrorResponse>> getUsers(int limit, int page);
 
   Future<Either<UserDetailResponse, ErrorResponse>> getUserDetail(String id);
+
+  int? getCurrentUserPage();
+
+  Future<void> saveCurrentUserPage(int page);
 }

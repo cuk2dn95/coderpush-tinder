@@ -1,16 +1,31 @@
 import 'dart:async';
+import 'package:coderpush_tinder/domain/usecase/user_page_usecase.dart';
+import 'package:flutter/cupertino.dart';
 import '../../domain/entity/user.dart';
 import '../../domain/usecase/get_user_detail_usecase.dart';
 import '../../domain/usecase/get_user_usecase.dart';
 import '../widget/tinder_card.dart';
 
-class HomeViewModel {
-  HomeViewModel(this.getUsersUseCase, this.getUserDetailUseCase) {
-
+class HomeViewModel extends ChangeNotifier {
+  HomeViewModel(this._getUsersUseCase, this._getUserDetailUseCase,
+      this._userPageUseCase) {
+    _currentPage = _userPageUseCase.getCurrentUserPage();
+    loadUser();
   }
 
-  final GetUsersUseCase getUsersUseCase;
-  final GetUserDetailUseCase getUserDetailUseCase;
+  final GetUsersUseCase _getUsersUseCase;
+  final GetUserDetailUseCase _getUserDetailUseCase;
+  final UserPageUseCase _userPageUseCase;
+
+  final List<User> users = List.empty(growable: true);
+
+  final int limit = 5;
+
+  bool isUserEmpty = false;
+  bool isFetchingUsers = false;
+  bool isInitFetch = true;
+
+  late int _currentPage;
 
   final _onDeclineButtonFocus = StreamController<bool>();
 
@@ -90,10 +105,69 @@ class HomeViewModel {
     _onSuperLikeOpacity.add(opacity);
   }
 
-  final _currentCardIndex = StreamController<int>.broadcast();
-  get currentCardIndex => _currentCardIndex.stream;
+  int _currentCardIndex = 0;
+  final thresholdIndexLoading = 5;
+
+  get currentCardIndex => _currentCardIndex;
 
   void onCurrentIndexCardChanged(int index) {
-    _currentCardIndex.add(index);
+    _currentCardIndex = index;
+    if (users.length - index <= thresholdIndexLoading) {
+      loadMoreUser();
+    }
+  }
+
+  void saveCurrentUserPage() {
+    _userPageUseCase.saveCurrentUserPage(_currentPage);
+  }
+
+  void loadUser() {
+    isFetchingUsers = true;
+    if (isInitFetch) {
+      notifyListeners();
+    }
+    onLoaded() {
+      isFetchingUsers = false;
+      if (isInitFetch) {
+        notifyListeners();
+        isInitFetch = false;
+      }
+    }
+
+    _getUsersUseCase(_currentPage, limit).then((value) {
+      value.fold((data) {
+        if (data.data.isNotEmpty) {
+          users.addAll(data.data);
+        } else {
+          isUserEmpty = true;
+        }
+        saveCurrentUserPage();
+        onLoaded();
+      }, (error) {
+        isUserEmpty = true;
+        onLoaded();
+      });
+    });
+  }
+
+  void loadMoreUser() {
+    if (isFetchingUsers || isUserEmpty) {
+      return;
+    }
+    _currentPage++;
+    loadUser();
+  }
+
+  void onUserChosen(User user) {
+    users.remove(user);
+    notifyListeners();
+  }
+
+  Future<String> getUserAge(String id) async {
+    return (await _getUserDetailUseCase(id)).fold(
+        (detail) =>
+            (DateTime.now().difference(detail.dateOfBirth).inDays ~/ 365)
+                .toString(),
+        (r) => "");
   }
 }

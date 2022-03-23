@@ -8,6 +8,8 @@ enum TriggerDirection { none, right, left, up, down }
 class TinderSwapCard extends StatefulWidget {
   final CardBuilder _cardBuilder;
 
+  final WidgetBuilder? _emptyCardBuilder;
+
   final int _totalNum;
 
   final int _stackNum;
@@ -60,6 +62,7 @@ class TinderSwapCard extends StatefulWidget {
     double? minWidth,
     double? minHeight,
     bool allowVerticalMovement = true,
+    WidgetBuilder? emptyCardBuilder,
     this.cardController,
     this.swipeCompleteCallback,
     this.swipeUpdateCallback,
@@ -74,6 +77,7 @@ class TinderSwapCard extends StatefulWidget {
         _animDuration = animDuration,
         _swipeEdge = swipeEdge,
         _swipeEdgeVertical = swipeEdgeVertical,
+        _emptyCardBuilder = emptyCardBuilder,
         _swipeUp = swipeUp,
         _swipeDown = swipeDown,
         _allowVerticalMovement = allowVerticalMovement, super(key: key) {
@@ -136,7 +140,7 @@ class _TinderSwapCardState extends State<TinderSwapCard>
 
   Widget _buildCard(BuildContext context, int realIndex) {
     if (realIndex < 0) {
-      return Container();
+      return widget._emptyCardBuilder?.call(context) ?? Container();
     }
     final index = realIndex - _currentFront;
 

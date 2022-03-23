@@ -1,33 +1,38 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Database {
-  Database() {
-    SharedPreferences.getInstance().then((value) => _pref = value);
+  Database(SharedPreferences sharedPreferences) {
+    _pref = sharedPreferences;
   }
 
   late SharedPreferences _pref;
 
-  void saveMapEntry(MapEntry<String, dynamic> entry) {
+  Future<void> saveMapEntry(MapEntry<String, dynamic> entry) async {
     final value = entry.value;
     final key = entry.key;
     if (value is int) {
-      _pref.setInt(key, value);
+      await _pref.setInt(key, value);
+      return;
     }
     if (value is bool) {
-      _pref.setBool(key, value);
+      await _pref.setBool(key, value);
+      return;
     }
     if (value is double) {
-      _pref.setDouble(key, value);
+      await _pref.setDouble(key, value);
+      return;
     }
     if (value is String) {
-      _pref.setString(key, value);
+      await _pref.setString(key, value);
+      return;
     }
 
     if (value is List<String>) {
-      _pref.setStringList(key, value);
+      await _pref.setStringList(key, value);
+      return;
     }
 
-    throw Exception('not support type');
+    throw Exception('not support type, $value');
   }
 
   T? getValue<T>(String key) {

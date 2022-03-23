@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:provider/provider.dart';
 import 'package:coderpush_tinder/config/di.dart';
 import 'package:coderpush_tinder/presentation/viewmodel/home_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -17,306 +17,351 @@ class _HomeScreenState extends State<HomeScreen> {
   final HomeViewModel viewmodel = Injector.homeViewModel();
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: SafeArea(
-          child: Stack(
-            children: [
-              Positioned.fill(
-                  child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: LayoutBuilder(
-                    builder: (context, BoxConstraints contrainst) {
-                  return TinderSwapCard(
-                    cardController: viewmodel.cardController,
-                    cardBuilder: (BuildContext context, int index) => ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Stack(
-                        children: [
-                          Positioned.fill(
-                              child: Container(
-                            decoration: const BoxDecoration(
-                                color: Colors.lightBlueAccent),
-                          )),
-                          Align(
-                            alignment: Alignment.topLeft,
-                            child: StreamBuilder<int>(
-                                stream: viewmodel.currentCardIndex,
-                                initialData: 0,
-                                builder: (context, snapshot) {
-                                  return Visibility(
-                                    visible: snapshot.requireData == index,
-                                    child: StreamBuilder<double>(
-                                        stream: viewmodel.onLikeOpacity,
-                                        initialData: 0,
-                                        builder: (context, snapshot) {
-                                          return _wrapperInteractionBadge(
-                                            'LIKE',
-                                            Colors.greenAccent,
+  Widget build(BuildContext context) =>
+      ChangeNotifierProvider<HomeViewModel>.value(
+        value: viewmodel,
+        child: Scaffold(
+          body: SafeArea(
+            child: Stack(
+              children: [
+                Positioned.fill(
+                    child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: LayoutBuilder(
+                      builder: (context, BoxConstraints contrainst) {
+                    return Consumer<HomeViewModel>(builder: (context, vm, _) {
+                      return TinderSwapCard(
+                        cardController: viewmodel.cardController,
+                        emptyCardBuilder: (BuildContext context) {
+                          if (viewmodel.isFetchingUsers) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.pinkAccent)),
+                            );
+                          }
+
+                          if (viewmodel.isUserEmpty) {
+                            return Center(
+                              child: Text(
+                                'No user',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline3
+                                    ?.copyWith(color: Colors.black),
+                              ),
+                            );
+                          }
+
+                          return Container();
+                        },
+                        cardBuilder: (BuildContext context, int index) =>
+                            ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                  child: Center(
+                                      child: Image.network(
+                                vm.users[index].picture,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.fitHeight,
+                              ))),
+                              Align(
+                                alignment: Alignment.topLeft,
+                                child: Visibility(
+                                  visible: 0 == index,
+                                  child: StreamBuilder<double>(
+                                      stream: viewmodel.onLikeOpacity,
+                                      initialData: 0,
+                                      builder: (context, snapshot) {
+                                        return _wrapperInteractionBadge(
+                                          'LIKE',
+                                          Colors.greenAccent,
+                                          Matrix4.identity()
+                                            ..setRotationZ(-pi / 18),
+                                          snapshot.requireData,
+                                        );
+                                      }),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: Visibility(
+                                  visible: 0 == index,
+                                  child: StreamBuilder<double>(
+                                      stream: viewmodel.onDeclineOpacity,
+                                      initialData: 0,
+                                      builder: (context, snapshot) {
+                                        return _wrapperInteractionBadge(
+                                          'NOPE',
+                                          Colors.redAccent,
+                                          Matrix4.identity()
+                                            ..setRotationZ(pi / 18),
+                                          snapshot.requireData,
+                                        );
+                                      }),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Visibility(
+                                  visible: 0 == index,
+                                  child: StreamBuilder<double>(
+                                      stream: viewmodel.onSuperLikeOpacity,
+                                      initialData: 0,
+                                      builder: (context, snapshot) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 65 + 16 + 80),
+                                          child: _wrapperInteractionBadge(
+                                            'SUPER LIKE',
+                                            Colors.lightBlueAccent,
                                             Matrix4.identity()
                                               ..setRotationZ(-pi / 18),
                                             snapshot.requireData,
-                                          );
-                                        }),
-                                  );
-                                }),
-                          ),
-                          Align(
-                            alignment: Alignment.topRight,
-                            child: StreamBuilder<int>(
-                                stream: viewmodel.currentCardIndex,
-                                initialData: 0,
-                                builder: (context, snapshot) {
-                                  return Visibility(
-                                    visible: snapshot.requireData == index,
-                                    child: StreamBuilder<double>(
-                                        stream: viewmodel.onDeclineOpacity,
-                                        initialData: 0,
-                                        builder: (context, snapshot) {
-                                          return _wrapperInteractionBadge(
-                                            'NOPE',
-                                            Colors.redAccent,
-                                            Matrix4.identity()
-                                              ..setRotationZ(pi / 18),
-                                            snapshot.requireData,
-                                          );
-                                        }),
-                                  );
-                                }),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: StreamBuilder<int>(
-                                stream: viewmodel.currentCardIndex,
-                                initialData: 0,
-                                builder: (context, snapshot) {
-                                  return Visibility(
-                                    visible: snapshot.requireData == index,
-                                    child: StreamBuilder<double>(
-                                        stream: viewmodel.onSuperLikeOpacity,
-                                        initialData: 0,
-                                        builder: (context, snapshot) {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 65 + 16 + 80),
-                                            child: _wrapperInteractionBadge(
-                                              'SUPER LIKE',
-                                              Colors.lightBlueAccent,
-                                              Matrix4.identity()
-                                                ..setRotationZ(-pi / 18),
-                                              snapshot.requireData,
-                                            ),
-                                          );
-                                        }),
-                                  );
-                                }),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: LayoutBuilder(
-                                builder: (BuildContext context,
-                                        BoxConstraints constraints) =>
-                                    Container(
-                                      height: constraints.maxHeight / 3,
-                                      decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                              begin: Alignment.topCenter,
-                                              end: Alignment.bottomCenter,
-                                              colors: [
-                                            Colors.black.withOpacity(0.01),
-                                            Colors.black
-                                          ],
-                                              stops: const <double>[
-                                            0,
-                                            0.6
-                                          ])),
-                                    )),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Padding(
-                              //total of height of bottom icon + padding (60)
-                              padding: const EdgeInsets.only(
-                                  bottom: 65 + 16 + 60, left: 16, right: 16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
+                                          ),
+                                        );
+                                      }),
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: LayoutBuilder(
+                                    builder: (BuildContext context,
+                                            BoxConstraints constraints) =>
+                                        Container(
+                                          height: constraints.maxHeight / 3,
+                                          decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [
+                                                Colors.black.withOpacity(0.01),
+                                                Colors.black
+                                              ],
+                                                  stops: const <double>[
+                                                0,
+                                                0.6
+                                              ])),
+                                        )),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Padding(
+                                  //total of height of bottom icon + padding (60)
+                                  padding: const EdgeInsets.only(
+                                      bottom: 65 + 16 + 60,
+                                      left: 16,
+                                      right: 16),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Flexible(
-                                        child: Text(
-                                          'Ha XuNa',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headline3!
-                                              .copyWith(color: Colors.white),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                        child: Text('24',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline3!
-                                                .copyWith(color: Colors.white)),
+                                      Row(
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              vm.users[index].name(),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headline4!
+                                                  .copyWith(
+                                                      color: Colors.white),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            child: StatefulBuilder(
+                                                builder: (context, setState) {
+                                              final user = vm.users[index];
+                                              if (user.age == null) {
+                                                vm
+                                                    .getUserAge(user.id)
+                                                    .then((value) {
+                                                  setState(() {
+                                                    user.age = value;
+                                                  });
+                                                });
+                                              }
+                                              return Text(user.age ?? "",
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headline4!
+                                                      .copyWith(
+                                                          color: Colors.white));
+                                            }),
+                                          )
+                                        ],
                                       )
                                     ],
-                                  )
-                                ],
-                              ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        totalNum: vm.users.length,
+                        maxWidth: contrainst.maxWidth,
+                        minWidth: contrainst.maxWidth * 0.9,
+                        maxHeight: contrainst.maxHeight,
+                        minHeight: contrainst.maxHeight * 0.9,
+                        swipeUp: true,
+                        swipeUpdateCallback:
+                            (DragUpdateDetails details, Alignment align) {
+                          /// Get swiping card's alignment
+
+                          viewmodel.onAttemptDecline(align.x);
+                          viewmodel.onAttemptLike(align.x);
+                          viewmodel.onAttemptSuperLike(align.y);
+
+                          if (align.y < 0) {
+                            //Card is UP swiping
+                            viewmodel.onSuperLikeButtonFocus(true);
+                            viewmodel.onDeclineButtonFocus(false);
+                            viewmodel.onLikeButtonFocus(false);
+                            return;
+                          }
+
+                          if (align.x < 0) {
+                            //Card is LEFT swiping
+                            viewmodel.onDeclineButtonFocus(true);
+                            viewmodel.onSuperLikeButtonFocus(false);
+                            viewmodel.onLikeButtonFocus(false);
+                            return;
+                          } else if (align.x > 0) {
+                            //Card is RIGHT swiping
+                            viewmodel.onLikeButtonFocus(true);
+                            viewmodel.onDeclineButtonFocus(false);
+                            viewmodel.onSuperLikeButtonFocus(false);
+                            return;
+                          }
+                          viewmodel.onLikeButtonFocus(false);
+                          viewmodel.onDeclineButtonFocus(false);
+                          viewmodel.onSuperLikeButtonFocus(false);
+                        },
+                        swipeCompleteCallback:
+                            (CardSwipeOrientation orientation, int index) {
+                          if (orientation != CardSwipeOrientation.recover) {
+                            viewmodel.onUserChosen(viewmodel.users[index]);
+                          }
+
+                          viewmodel.onCurrentIndexCardChanged(
+                              orientation == CardSwipeOrientation.recover
+                                  ? index
+                                  : index + 1);
+                          viewmodel.onAttemptDecline(0);
+                          viewmodel.onAttemptLike(0);
+                          viewmodel.onAttemptSuperLike(0);
+
+                          viewmodel.onLikeButtonFocus(false);
+                          viewmodel.onDeclineButtonFocus(false);
+                          viewmodel.onSuperLikeButtonFocus(false);
+                        },
+                      );
+                    });
+                  }),
+                )),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(bottom: 24, left: 16, right: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _wrapperInteractionIcon(
+                            const Icon(
+                              Icons.replay,
+                              color: Colors.yellow,
                             ),
-                          )
-                        ],
-                      ),
+                            const Icon(
+                              Icons.replay,
+                              color: Colors.white,
+                            ),
+                            Colors.yellow,
+                            onTap: () {}),
+                        StreamBuilder<bool>(
+                          stream: viewmodel.declineButtonFocusStream,
+                          initialData: false,
+                          builder: (_, AsyncSnapshot<bool> snapshot) =>
+                              _wrapperInteractionIcon(
+                                  const Icon(
+                                    Icons.close,
+                                    color: Colors.red,
+                                    size: 30,
+                                  ),
+                                  const Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  Colors.red,
+                                  size: 65, onTap: () {
+                            viewmodel.onDecline(null);
+                          }, isFocus: snapshot.data),
+                        ),
+                        StreamBuilder<bool>(
+                          stream: viewmodel.superLikeButtonFocusStream,
+                          initialData: false,
+                          builder: (_, AsyncSnapshot<bool> snapshot) =>
+                              _wrapperInteractionIcon(
+                                  const Icon(
+                                    Icons.star,
+                                    color: Colors.blue,
+                                  ),
+                                  const Icon(
+                                    Icons.star,
+                                    color: Colors.white,
+                                  ),
+                                  Colors.blue, onTap: () {
+                            viewmodel.onSuperLike(null);
+                          }, isFocus: snapshot.data),
+                        ),
+                        StreamBuilder<bool>(
+                          stream: viewmodel.likeButtonFocusStream,
+                          initialData: false,
+                          builder: (_, AsyncSnapshot<bool> snapshot) =>
+                              _wrapperInteractionIcon(
+                                  const Icon(
+                                    Icons.favorite,
+                                    color: Colors.green,
+                                    size: 28,
+                                  ),
+                                  const Icon(
+                                    Icons.favorite,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                  Colors.green,
+                                  size: 65, onTap: () {
+                            viewmodel.onLike(null);
+                          }, isFocus: snapshot.data),
+                        ),
+                        _wrapperInteractionIcon(
+                            const Icon(
+                              Icons.flash_on,
+                              color: Colors.purple,
+                            ),
+                            const Icon(
+                              Icons.flash_on,
+                              color: Colors.white,
+                            ),
+                            Colors.purple,
+                            onTap: () {}),
+                      ],
                     ),
-                    totalNum: 15,
-                    maxWidth: contrainst.maxWidth,
-                    minWidth: contrainst.maxWidth * 0.9,
-                    maxHeight: contrainst.maxHeight,
-                    minHeight: contrainst.maxHeight * 0.9,
-                    swipeUp: true,
-                    swipeUpdateCallback:
-                        (DragUpdateDetails details, Alignment align) {
-                      /// Get swiping card's alignment
-
-                      viewmodel.onAttemptDecline(align.x);
-                      viewmodel.onAttemptLike(align.x);
-                      viewmodel.onAttemptSuperLike(align.y);
-
-                      if (align.y < 0) {
-                        viewmodel.onSuperLikeButtonFocus(true);
-                        viewmodel.onDeclineButtonFocus(false);
-                        viewmodel.onLikeButtonFocus(false);
-                        return;
-                      }
-
-                      if (align.x < 0) {
-                        viewmodel.onDeclineButtonFocus(true);
-                        viewmodel.onSuperLikeButtonFocus(false);
-                        viewmodel.onLikeButtonFocus(false);
-                        return;
-                      } else if (align.x > 0) {
-                        //Card is RIGHT swiping
-                        viewmodel.onLikeButtonFocus(true);
-                        viewmodel.onDeclineButtonFocus(false);
-                        viewmodel.onSuperLikeButtonFocus(false);
-                        return;
-                      }
-                      viewmodel.onLikeButtonFocus(false);
-                      viewmodel.onDeclineButtonFocus(false);
-                      viewmodel.onSuperLikeButtonFocus(false);
-                    },
-                    swipeCompleteCallback:
-                        (CardSwipeOrientation orientation, int index) {
-                      viewmodel.onCurrentIndexCardChanged(orientation  == CardSwipeOrientation.recover ?index : index +1);
-                      viewmodel.onAttemptDecline(0);
-                      viewmodel.onAttemptLike(0);
-                      viewmodel.onAttemptSuperLike(0);
-
-                      viewmodel.onLikeButtonFocus(false);
-                      viewmodel.onDeclineButtonFocus(false);
-                      viewmodel.onSuperLikeButtonFocus(false);
-                    },
-                  );
-                }),
-              )),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.only(bottom: 24, left: 16, right: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _wrapperInteractionIcon(
-                          const Icon(
-                            Icons.replay,
-                            color: Colors.yellow,
-                          ),
-                          const Icon(
-                            Icons.replay,
-                            color: Colors.white,
-                          ),
-                          Colors.yellow,
-                          onTap: () {}),
-                      StreamBuilder<bool>(
-                        stream: viewmodel.declineButtonFocusStream,
-                        initialData: false,
-                        builder: (_, AsyncSnapshot<bool> snapshot) =>
-                            _wrapperInteractionIcon(
-                                const Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                  size: 30,
-                                ),
-                                const Icon(
-                                  Icons.close,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                                Colors.red,
-                                size: 65, onTap: () {
-                          viewmodel.onDecline(null);
-                        }, isFocus: snapshot.data),
-                      ),
-                      StreamBuilder<bool>(
-                        stream: viewmodel.superLikeButtonFocusStream,
-                        initialData: false,
-                        builder: (_, AsyncSnapshot<bool> snapshot) =>
-                            _wrapperInteractionIcon(
-                                const Icon(
-                                  Icons.star,
-                                  color: Colors.blue,
-                                ),
-                                const Icon(
-                                  Icons.star,
-                                  color: Colors.white,
-                                ),
-                                Colors.blue, onTap: () {
-                          viewmodel.onSuperLike(null);
-                        }, isFocus: snapshot.data),
-                      ),
-                      StreamBuilder<bool>(
-                        stream: viewmodel.likeButtonFocusStream,
-                        initialData: false,
-                        builder: (_, AsyncSnapshot<bool> snapshot) =>
-                            _wrapperInteractionIcon(
-                                const Icon(
-                                  Icons.favorite,
-                                  color: Colors.green,
-                                  size: 28,
-                                ),
-                                const Icon(
-                                  Icons.favorite,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                                Colors.green,
-                                size: 65, onTap: () {
-                          viewmodel.onLike(null);
-                        }, isFocus: snapshot.data),
-                      ),
-                      _wrapperInteractionIcon(
-                          const Icon(
-                            Icons.flash_on,
-                            color: Colors.purple,
-                          ),
-                          const Icon(
-                            Icons.flash_on,
-                            color: Colors.white,
-                          ),
-                          Colors.purple,
-                          onTap: () {}),
-                    ],
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
+          bottomNavigationBar: const BottomNavigation(),
         ),
-        bottomNavigationBar: const BottomNavigation(),
       );
 
   Widget _wrapperInteractionBadge(
